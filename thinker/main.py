@@ -4,10 +4,20 @@ import os
 import subprocess
 from PIL import Image, ImageDraw
 import pystray
+import sys
+import io
 
 client_process = None
 server_process = None
 icon = None
+
+class StdoutRedirector(io.TextIOBase):
+    def __init__(self, text_widget):
+        self.text_widget = text_widget
+
+    def write(self, s):
+        self.text_widget.insert(tk.END, s)
+        self.text_widget.see(tk.END)
 
 def run_client():
     global client_process
@@ -101,7 +111,7 @@ def quit_app():
 
 app = tk.Tk()
 app.title("Thinker")
-app.geometry("300x300")
+app.geometry("600x400")
 
 # Override the close button
 app.protocol("WM_DELETE_WINDOW", on_closing)
@@ -127,6 +137,18 @@ stop_server_button = tk.Button(server_frame, text="Stop Server", command=stop_se
 stop_server_button.grid(row=0, column=1, padx=5)
 
 stop_all_button = tk.Button(app, text="Stop All", command=stop_all, state=tk.DISABLED)
-stop_all_button.pack(pady=20)
+stop_all_button.pack(pady=10)
+
+# Text widget for logging
+log_frame = tk.Frame(app)
+log_frame.pack(pady=10, fill=tk.BOTH, expand=True)
+log_text = tk.Text(log_frame, wrap='word')
+log_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+log_scroll = tk.Scrollbar(log_frame, command=log_text.yview)
+log_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+log_text.config(yscrollcommand=log_scroll.set)
+
+# Redirect stdout to the Text widget
+sys.stdout = StdoutRedirector(log_text)
 
 app.mainloop()
