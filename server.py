@@ -29,14 +29,15 @@ def receive_screenshot():
         client_socket.close()
 
         image = Image.open(BytesIO(image_data))
-        image.show()
+
+        # Save image locally to verify it's received correctly (optional)
+        image.save('received_screenshot.png')
 
         output = BytesIO()
-        image.save(output, format='PNG')
-        data = output.getvalue()
+        image.convert('RGB').save(output, format='BMP')
+        data = output.getvalue()[14:]  # BMP files include a 14-byte header we need to remove
         output.close()
 
-        # Convert the PNG data to the required format for the clipboard
         send_to_clipboard(win32clipboard.CF_DIB, data)
         print("Screenshot copied to clipboard!")
 
