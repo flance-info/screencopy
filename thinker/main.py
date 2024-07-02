@@ -48,17 +48,25 @@ app = tk.Tk()
 app.title("Thinker")
 app.geometry("300x300")
 
-client_button = tk.Button(app, text="Start Client", command=run_client)
-client_button.pack(pady=10)
+# Frame for client buttons
+client_frame = tk.Frame(app)
+client_frame.pack(pady=10)
 
-stop_client_button = tk.Button(app, text="Stop Client", command=stop_client, state=tk.DISABLED)
-stop_client_button.pack(pady=10)
+client_button = tk.Button(client_frame, text="Start Client", command=run_client)
+client_button.grid(row=0, column=0, padx=5)
 
-server_button = tk.Button(app, text="Start Server", command=run_server)
-server_button.pack(pady=10)
+stop_client_button = tk.Button(client_frame, text="Stop Client", command=stop_client, state=tk.DISABLED)
+stop_client_button.grid(row=0, column=1, padx=5)
 
-stop_server_button = tk.Button(app, text="Stop Server", command=stop_server, state=tk.DISABLED)
-stop_server_button.pack(pady=10)
+# Frame for server buttons
+server_frame = tk.Frame(app)
+server_frame.pack(pady=10)
+
+server_button = tk.Button(server_frame, text="Start Server", command=run_server)
+server_button.grid(row=0, column=0, padx=5)
+
+stop_server_button = tk.Button(server_frame, text="Stop Server", command=stop_server, state=tk.DISABLED)
+stop_server_button.grid(row=0, column=1, padx=5)
 
 stop_all_button = tk.Button(app, text="Stop All", command=stop_all, state=tk.DISABLED)
 stop_all_button.pack(pady=20)
