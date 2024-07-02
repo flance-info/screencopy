@@ -20,7 +20,12 @@ def receive_screenshot():
        os.makedirs('screens')
 
     while not stop_server:
-        client_socket, client_address = server_socket.accept()
+        server_socket.settimeout(1.0)
+        try:
+            client_socket, client_address = server_socket.accept()
+        except socket.timeout:
+            continue
+
         print(f"Connection from {client_address}")
 
         image_data = b''
@@ -52,6 +57,7 @@ def receive_screenshot():
         print("Screenshot copied to clipboard!")
 
     server_socket.close()
+    print("Server stopped.")
 
 def stop_server_listener():
     global stop_server
