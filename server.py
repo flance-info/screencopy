@@ -32,10 +32,11 @@ def receive_screenshot():
         image.show()
 
         output = BytesIO()
-        image.convert('RGB').save(output, format='BMP')
-        data = output.getvalue()[14:]
+        image.save(output, format='PNG')
+        data = output.getvalue()
         output.close()
 
+        # Convert the PNG data to the required format for the clipboard
         send_to_clipboard(win32clipboard.CF_DIB, data)
         print("Screenshot copied to clipboard!")
 
