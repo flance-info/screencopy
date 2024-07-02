@@ -2,7 +2,10 @@ import socket
 from PIL import Image
 from io import BytesIO
 from clipboard import send_to_clipboard  # Changed to absolute import
+import win32clipboard
 import threading
+import time
+import keyboard  # Import the keyboard module
 
 stop_server = False
 
@@ -27,6 +30,12 @@ def receive_screenshot():
         client_socket.close()
 
         image = Image.open(BytesIO(image_data))
+
+        # Save image locally with a unique filename
+        timestamp = int(time.time())
+        filename = f'received_screenshot_{timestamp}.png'
+        image.save(filename)
+        print(f"Screenshot saved as {filename}")
         # image.show()
 
         output = BytesIO()
