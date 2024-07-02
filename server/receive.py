@@ -23,7 +23,7 @@ def receive_screenshot():
         client_socket.close()
 
         image = Image.open(BytesIO(image_data))
-        image.show()
+        # image.show()
 
         output = BytesIO()
         image.convert('RGB').save(output, format='BMP')

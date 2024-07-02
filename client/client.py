@@ -1,40 +1,44 @@
 import socket
-from PIL import ImageGrab
+import pyautogui
+from PIL import Image
 from io import BytesIO
 import keyboard
-import time
-import win32clipboard
 
-def send_screenshot():
-    # Give some time for the screenshot to be copied to the clipboard
-    time.sleep(1)
+def discover_server_ip():
+    discovery_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    discovery_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    discovery_socket.bind(('', 12345))
+
+    while True:
+        data, addr = discovery_socket.recvfrom(1024)
+        message = data.decode('utf-8')
+        if message.startswith('SERVER_IP:'):
+            server_ip = message.split(':')[1]
+            print(f"Discovered server IP: {server_ip}")
+            return server_ip
+
+def send_screenshot(server_ip):
+    screenshot = pyautogui.screenshot()
+    buffer = BytesIO()
+    screenshot.save(buffer, format='PNG')
+    image_data = buffer.getvalue()
+    buffer.close()
 
     try:
-        win32clipboard.OpenClipboard()
-        data = win32clipboard.GetClipboardData(win32clipboard.CF_DIB)
-        win32clipboard.CloseClipboard()
-
-        image = ImageGrab.grabclipboard()
-        if image is None:
-            print("No image found in clipboard.")
-            return
-
-        buffer = BytesIO()
-        image.save(buffer, format='PNG')
-        image_data = buffer.getvalue()
-        buffer.close()
-
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect(('127.0.0.1', 12345))  # Use localhost IP address for the same PC
+        client_socket.connect((server_ip, 12345))
         client_socket.sendall(image_data)
         client_socket.close()
         print("Screenshot sent!")
-    except Exception as e:
-        print(f"Failed to send screenshot: {e}")
+    except ConnectionRefusedError:
+        print("Failed to connect to the server. Make sure the server is running.")
 
 if __name__ == "__main__":
-    print("Press Alt+PrtSc to send a screenshot of the active window")
-    keyboard.add_hotkey('alt+print screen', send_screenshot)  # Use Alt + PrtSc for the active window
+    print("Discovering server...")
+    server_ip = discover_server_ip()
+
+    print("Press Ctrl+M to send a screenshot")
+    keyboard.add_hotkey('ctrl+m', lambda: send_screenshot(server_ip))
 
     # Keep the script running
     keyboard.wait('esc')  # Press 'Esc' to stop the script
