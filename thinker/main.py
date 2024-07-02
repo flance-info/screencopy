@@ -5,22 +5,29 @@ import subprocess
 from PIL import Image, ImageDraw
 import pystray
 import sys
-import io
+import logging
+from logging import StreamHandler
 
 client_process = None
 server_process = None
 icon = None
 
-class StdoutRedirector(io.TextIOBase):
+class TextHandler(StreamHandler):
+    """This class allows logging to a Tkinter Text widget"""
     def __init__(self, text_widget):
+        StreamHandler.__init__(self)
         self.text_widget = text_widget
 
-    def write(self, s):
-        self.text_widget.insert(tk.END, s)
-        self.text_widget.see(tk.END)
+    def emit(self, record):
+        msg = self.format(record)
+        def append():
+            self.text_widget.insert(tk.END, msg + '\n')
+            self.text_widget.see(tk.END)
+        self.text_widget.after(0, append)
 
 def run_client():
     global client_process
+    logging.info("Starting client...")
     client_button.config(text="Client Processing...")
     client_process = subprocess.Popen(['python', 'client/client.py'])
     stop_client_button.config(state=tk.NORMAL)
@@ -28,6 +35,7 @@ def run_client():
 
 def run_server():
     global server_process
+    logging.info("Starting server...")
     server_button.config(text="Server Processing...")
     server_process = subprocess.Popen(['python', 'server/main.py'])
     stop_server_button.config(state=tk.NORMAL)
@@ -36,6 +44,7 @@ def run_server():
 def stop_client():
     global client_process
     if client_process:
+        logging.info("Stopping client...")
         client_process.terminate()
         client_process = None
         client_button.config(text="Start Client")
@@ -46,6 +55,7 @@ def stop_client():
 def stop_server():
     global server_process
     if server_process:
+        logging.info("Stopping server...")
         server_process.terminate()
         server_process = None
         server_button.config(text="Start Server")
@@ -148,7 +158,8 @@ log_scroll = tk.Scrollbar(log_frame, command=log_text.yview)
 log_scroll.pack(side=tk.RIGHT, fill=tk.Y)
 log_text.config(yscrollcommand=log_scroll.set)
 
-# Redirect stdout to the Text widget
-sys.stdout = StdoutRedirector(log_text)
+# Set up logging
+text_handler = TextHandler(log_text)
+logging.basicConfig(level=logging.INFO, handlers=[text_handler])
 
 app.mainloop()
