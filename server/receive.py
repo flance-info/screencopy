@@ -1,7 +1,7 @@
 import socket
 from PIL import Image
 from io import BytesIO
-from .clipboard import send_to_clipboard
+from clipboard import send_to_clipboard  # Changed to absolute import
 import threading
 
 stop_server = False
@@ -27,7 +27,7 @@ def receive_screenshot():
         client_socket.close()
 
         image = Image.open(BytesIO(image_data))
-       # image.show()
+        # image.show()
 
         output = BytesIO()
         image.convert('RGB').save(output, format='BMP')

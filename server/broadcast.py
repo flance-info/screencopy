@@ -1,6 +1,6 @@
 import socket
 import time
-from .utils import get_local_ip
+from utils import get_local_ip
 
 def broadcast_ip():
     broadcast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
