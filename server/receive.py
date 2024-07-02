@@ -5,6 +5,7 @@ from clipboard import send_to_clipboard  # Changed to absolute import
 import win32clipboard
 import threading
 import time
+import os
 import keyboard  # Import the keyboard module
 
 stop_server = False
@@ -15,6 +16,8 @@ def receive_screenshot():
     server_socket.bind(('0.0.0.0', 12345))  # Bind to all available interfaces
     server_socket.listen(1)
     print("Server is running and waiting for connections...")
+    if not os.path.exists('screens'):
+       os.makedirs('screens')
 
     while not stop_server:
         client_socket, client_address = server_socket.accept()
@@ -34,8 +37,10 @@ def receive_screenshot():
         # Save image locally with a unique filename
         timestamp = int(time.time())
         filename = f'received_screenshot_{timestamp}.png'
-        image.save(filename)
-        print(f"Screenshot saved as {filename}")
+        filepath = os.path.join('screens', filename)
+        image.save(filepath)
+        print(f"Screenshot saved to {filepath}")
+
         # image.show()
 
         output = BytesIO()
