@@ -7,6 +7,7 @@ import pystray
 
 client_process = None
 server_process = None
+icon = None
 
 def run_client():
     global client_process
@@ -71,15 +72,30 @@ def on_closing():
     hide_window()
 
 def hide_window():
+    global icon
     app.withdraw()
-    icon.run()
+    if icon is None:
+        icon = pystray.Icon("Thinker")
+        icon.icon = create_image()
+        icon.title = "Thinker"
+        icon.menu = pystray.Menu(
+            pystray.MenuItem("Open", lambda: show_window()),
+            pystray.MenuItem("Quit", lambda: quit_app())
+        )
+        threading.Thread(target=icon.run, daemon=True).start()
 
 def show_window():
-    icon.stop()
+    global icon
     app.after(0, app.deiconify)
+    if icon:
+        icon.stop()
+        icon = None
 
 def quit_app():
-    icon.stop()
+    global icon
+    if icon:
+        icon.stop()
+        icon = None
     app.quit()
 
 app = tk.Tk()
@@ -111,14 +127,5 @@ stop_server_button.grid(row=0, column=1, padx=5)
 
 stop_all_button = tk.Button(app, text="Stop All", command=stop_all, state=tk.DISABLED)
 stop_all_button.pack(pady=20)
-
-# Create the system tray icon
-icon = pystray.Icon("Thinker")
-icon.icon = create_image()
-icon.title = "Thinker"
-icon.menu = pystray.Menu(
-    pystray.MenuItem("Open", lambda: show_window()),
-    pystray.MenuItem("Quit", lambda: quit_app())
-)
 
 app.mainloop()
