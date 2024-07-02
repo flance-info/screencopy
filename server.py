@@ -42,7 +42,7 @@ def receive_screenshot(server_socket):
             output.close()
 
             send_to_clipboard(win32clipboard.CF_DIB, data)
-            print("Screenshot copied to clipboard!")
+            print("Screenshot copiedee to clipboard!")
 
         except socket.timeout:
             continue
@@ -64,6 +64,7 @@ if __name__ == "__main__":
     print("Press Esc to stop the server")
 
     keyboard.wait('esc')
+    print("1 Server stopped.")
     stop_event.set()
     server_socket.close()
     server_thread.join()
