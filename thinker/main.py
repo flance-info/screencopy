@@ -2,6 +2,8 @@ import tkinter as tk
 import threading
 import os
 import subprocess
+from PIL import Image, ImageDraw
+import pystray
 
 client_process = None
 server_process = None
@@ -44,9 +46,48 @@ def stop_all():
     stop_client()
     stop_server()
 
+def create_image():
+    # Generate an image and draw a pattern
+    width = 64
+    height = 64
+    image = Image.new('RGB', (width, height), (255, 255, 255))
+    dc = ImageDraw.Draw(image)
+    dc.rectangle(
+        (width // 2, 0, width, height // 2),
+        fill=(255, 0, 0))
+    dc.rectangle(
+        (0, height // 2, width // 2, height),
+        fill=(0, 255, 0))
+    dc.rectangle(
+        (width // 2, height // 2, width, height),
+        fill=(0, 0, 255))
+    dc.rectangle(
+        (0, 0, width // 2, height // 2),
+        fill=(255, 255, 0))
+
+    return image
+
+def on_closing():
+    hide_window()
+
+def hide_window():
+    app.withdraw()
+    icon.run()
+
+def show_window():
+    icon.stop()
+    app.after(0, app.deiconify)
+
+def quit_app():
+    icon.stop()
+    app.quit()
+
 app = tk.Tk()
 app.title("Thinker")
 app.geometry("300x300")
+
+# Override the close button
+app.protocol("WM_DELETE_WINDOW", on_closing)
 
 # Frame for client buttons
 client_frame = tk.Frame(app)
@@ -70,5 +111,14 @@ stop_server_button.grid(row=0, column=1, padx=5)
 
 stop_all_button = tk.Button(app, text="Stop All", command=stop_all, state=tk.DISABLED)
 stop_all_button.pack(pady=20)
+
+# Create the system tray icon
+icon = pystray.Icon("Thinker")
+icon.icon = create_image()
+icon.title = "Thinker"
+icon.menu = pystray.Menu(
+    pystray.MenuItem("Open", lambda: show_window()),
+    pystray.MenuItem("Quit", lambda: quit_app())
+)
 
 app.mainloop()
