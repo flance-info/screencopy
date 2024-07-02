@@ -22,7 +22,6 @@ def discover_server_ip():
 def get_clipboard_image():
     win32clipboard.OpenClipboard()
     try:
-        win32clipboard.OpenClipboard()
         data = win32clipboard.GetClipboardData(win32clipboard.CF_DIB)
         win32clipboard.CloseClipboard()
 
