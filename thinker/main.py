@@ -93,6 +93,7 @@ def show_window():
 
 def quit_app():
     global icon
+    stop_all()
     if icon:
         icon.stop()
         icon = None
