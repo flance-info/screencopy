@@ -1,5 +1,5 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
-import urllib.parse as urlparse
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+import urlparse
 import json
 import os
 from datetime import datetime
@@ -10,12 +10,12 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
-        self.wfile.write(b"Welcome to the IP Logger!")
+        self.wfile.write("Welcome to the IP Logger!")
 
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])  # Get the size of data
         post_data = self.rfile.read(content_length)  # Get the data
-        parsed_data = urlparse.parse_qs(post_data.decode('utf-8'))  # Parse the data
+        parsed_data = urlparse.parse_qs(post_data)  # Parse the data
 
         local_ip = parsed_data.get('local_ip', [None])[0]  # Get the 'local_ip' value
 

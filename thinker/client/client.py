@@ -58,8 +58,8 @@ def send_screenshot(server_ip):
 
 if __name__ == "__main__":
     print("Discovering server...")
-    server_ip = discover_server_ip()
-
+    ##server_ip = discover_server_ip()
+    server_ip = "192.168.1.236"
     print("Press Alt + Print Screen to send a screenshot from clipboard")
     keyboard.add_hotkey('alt+print_screen', lambda: send_screenshot(server_ip))
 
